@@ -16,4 +16,4 @@ player > rotation
 
 /////////////////
 
-select node multiplayerSpawner > inspector > player scene > drag n drop player tscn
+select node multiplayerSpawner > inspector > player scene > drag n drop player.tscn

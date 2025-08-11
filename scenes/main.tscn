@@ -8,3 +8,13 @@ script = ExtResource("1_0wfyh")
 
 [node name="Steam" type="Node" parent="."]
 script = ExtResource("1_o5qli")
+
+[node name="Host" type="Button" parent="."]
+offset_right = 376.0
+offset_bottom = 193.0
+text = "Host"
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("..")
+
+[connection signal="pressed" from="Host" to="." method="_on_host_pressed"]
