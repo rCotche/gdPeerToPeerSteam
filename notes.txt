@@ -1,0 +1,19 @@
+“si je suis l’autorité (typiquement le serveur), je me crée mon joueur (ID 1) et j’écoute les connexions/déconnexions pour créer/supprimer les joueurs à la volée.”
+
+func _ready() -> void:
+	spawn_function = spawnPlayer
+	if is_multiplayer_authority():
+		spawn(1)
+		multiplayer.peer_connected.connect(spawn)
+		multiplayer.peer_disconnected.connect(removePlayer)
+
+/////////////////
+
+add node multiplayer synchronizer > select node > en bas au niveau du terminal, add property to sync
+player > position
+select node > en bas au niveau du terminal, add property to sync
+player > rotation
+
+/////////////////
+
+select node multiplayerSpawner > inspector > player scene > drag n drop player tscn
