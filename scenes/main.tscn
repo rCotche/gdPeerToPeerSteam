@@ -14,7 +14,24 @@ offset_right = 376.0
 offset_bottom = 193.0
 text = "Host"
 
+[node name="Refresh" type="Button" parent="."]
+offset_left = 2.0
+offset_top = 198.0
+offset_right = 378.0
+offset_bottom = 391.0
+text = "Refresh"
+
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 spawn_path = NodePath("..")
 
+[node name="LobbyContainer" type="ScrollContainer" parent="."]
+offset_left = 417.0
+offset_top = 33.0
+offset_right = 1017.0
+offset_bottom = 333.0
+
+[node name="Lobbies" type="VBoxContainer" parent="LobbyContainer"]
+layout_mode = 2
+
 [connection signal="pressed" from="Host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="Refresh" to="." method="_on_refresh_pressed"]

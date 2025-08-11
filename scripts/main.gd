@@ -20,6 +20,20 @@ func _ready() -> void:
 	#qui appelleront localement spawn_level(data)
 	#et retourneront un Node non encore dans l’arbre.
 	multiplayer_spawner.spawn_function = spawn_level
+	#connect le signal
+	peer.lobby_created.connect(_on_lobby_created)
+	Steam.lobby_match_list.connect(on_lobby_match_list)
+	open_lobby_list()
+
+func join_lobby(id):
+	#on se connecte avec le lobby : lobby_id
+	peer.connect_lobby(id)
+	#godot
+	multiplayer.multiplayer_peer = peer
+	lobby_id = id
+	$Host.hide()
+	$LobbyContainer/Lobbies.hide()
+	$Refresh.hide()
 
 #Ta fonction de spawn reçoit data (ici, un chemin de scène),
 #charge le PackedScene, instancie le niveau,
@@ -49,6 +63,8 @@ func _on_host_pressed() -> void:
 	#et les retardataires la recevront à la connexion.
 	multiplayer_spawner.spawn("res://scenes/level.tscn")
 	$Host.hide()
+	$LobbyContainer/Lobbies.hide()
+	$Refresh.hide()
 
 func _on_lobby_created(connect, id):
 	#Si la création a réussi, on mémorise l’id du lobby.
@@ -62,3 +78,39 @@ func _on_lobby_created(connect, id):
 		#et visible dans les recherches
 		#(condition nécessaire pour que requestLobbyList le renvoie). 
 		Steam.setLobbyJoinable(lobby_id, true)
+		print(lobby_id)
+
+func open_lobby_list():
+	#règle le filtre de distance
+	#sur worldwide (pas de restriction géographique).
+	#Le filtrage se base sur la géolocalisation IP
+	#de l’utilisateur ;
+	#les valeurs possibles sont CLOSE / DEFAULT / FAR / WORLDWIDE.
+	#Attention : WORLDWIDE peut renvoyer des lobbies très éloignés
+	#⇒ latence élevée.
+	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
+	#envoie la requête asynchrone qui applique les filtres définis juste avant.
+	#Par défaut (si tu n’appelles pas le filtre),
+	#Steam utilise DEFAULT
+	#et ne renverra que des lobbies de ta région ou proches.
+	Steam.requestLobbyList()
+
+func on_lobby_match_list(lobbies):
+	for lobby in lobbies:
+		var lobby_name = Steam.getLobbyData(lobby, "name")
+		var member_count = Steam.getNumLobbyMembers(lobby)
+		
+		var btn = Button.new()
+		btn.set_text(str(lobby_name, "| Player count : ", member_count))
+		btn.set_size(Vector2(100,5))
+		#connect le signal pressed
+		btn.connect("pressed", Callable(self, "join_lobby").bind(lobby))
+		
+		$LobbyContainer/Lobbies.add_child(btn)
+
+
+func _on_refresh_pressed() -> void:
+	if $LobbyContainer/Lobbies.get_child_count() > 0:
+		for unLobby in $LobbyContainer/Lobbies.get_children():
+			unLobby.queue_free()
+	open_lobby_list()
